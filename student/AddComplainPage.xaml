@@ -1,0 +1,29 @@
+﻿<Window x:Class="student.AddComplainPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:student"
+        mc:Ignorable="d"
+        Title="AddComplainPage" Height="450" Width="800">
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock x:Name="txtComplainID" Text="Complain ID:" Visibility="Collapsed"/>
+            <TextBlock Text="Complain Title:" />
+            <TextBox x:Name="txtComplainTitle" Margin="5"/>
+            <TextBlock Text="Complain Details:" />
+            <TextBox x:Name="txtComplainDetail" Margin="5" AcceptsReturn="True" Height="100"/>
+            <TextBlock Text="Complain Date:" />
+            <DatePicker x:Name="dpComplainDate" Margin="5"/>
+            <TextBlock x:Name="textDateClose" Text="Close Date:" Visibility="Collapsed"/>
+            <DatePicker x:Name="dpDateClose" Margin="5" Visibility="Collapsed"/>
+            <TextBlock Text="Complain By:" />
+            <ComboBox x:Name="cboStudentName" Margin="5"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Name="backBtn" Content="Back" Click="BackButton_Click" Margin="5"/>
+                <Button Name="saveBtn" Content="Save" Click="SaveButton_Click" Margin="5"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

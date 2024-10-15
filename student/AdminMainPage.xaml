@@ -1,0 +1,49 @@
+﻿<Window x:Class="student.AdminMainPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:student"
+        mc:Ignorable="d"
+        Title="AdminMainPage" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="test" Text="Hi loginUser" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"  Height="20"/>
+        <Button Content="Logout" Margin="320,0,0,0" Click="BackButton_Click" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"  Height="20" Grid.Column="1"/>
+        <!-- Box 1 -->
+        <Button Grid.Row="1" Grid.Column="0" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box1_Click">
+            <StackPanel>
+                <TextBlock Text="View All Complain" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
+
+        <!-- Box 2 -->
+        <Button Grid.Row="1" Grid.Column="1" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box2_Click">
+            <StackPanel>
+                <TextBlock Text="View All Student" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
+
+        <!-- Box 3 --><!--
+        <Button Grid.Row="2" Grid.Column="0" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box3_Click">
+            <StackPanel>
+                <TextBlock Text="Text 3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
+
+        --><!-- Box 4 --><!--
+        <Button Grid.Row="2" Grid.Column="1" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box4_Click">
+            <StackPanel>
+                <TextBlock Text="Text 4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>-->
+    </Grid>
+</Window>

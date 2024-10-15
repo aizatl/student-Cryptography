@@ -1,0 +1,22 @@
+﻿<Window x:Class="student.CreateAcc"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:student"
+        mc:Ignorable="d"
+        Title="CreateAcc" Height="450" Width="800">
+    <Grid>
+        <TextBlock Text="Name:" Margin="30,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <TextBox x:Name="NameTextBox" Width="200" Margin="100,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+        <TextBlock Text="Username:" Margin="30,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <TextBox x:Name="UsernameBox" Width="200" Margin="100,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        
+        <TextBlock Text="Password:" Margin="30,90,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <PasswordBox x:Name="PasswordBox" Width="200" Margin="100,90,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+        <Button Content="Create" Width="100" Height="20" Margin="200,125,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CreateButton_Click"/>
+        
+    </Grid>
+</Window>
