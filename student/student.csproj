@@ -61,14 +61,23 @@
     <Compile Include="AdminMainPage.xaml.cs">
       <DependentUpon>AdminMainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AES.xaml.cs">
+      <DependentUpon>AES.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Complain.xaml.cs">
       <DependentUpon>Complain.xaml</DependentUpon>
     </Compile>
     <Compile Include="CreateAcc.xaml.cs">
       <DependentUpon>CreateAcc.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DES.xaml.cs">
+      <DependentUpon>DES.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EditComplain.xaml.cs">
       <DependentUpon>EditComplain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TDES.xaml.cs">
+      <DependentUpon>TDES.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window1.xaml.cs">
       <DependentUpon>Window1.xaml</DependentUpon>
@@ -81,11 +90,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AES.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Complain.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CreateAcc.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DES.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -105,6 +122,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TDES.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Window1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

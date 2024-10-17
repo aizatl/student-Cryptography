@@ -33,9 +33,10 @@ namespace student
             byte[] saltBytes = GenerateSalt();
             string salt = Convert.ToBase64String(saltBytes);
             string hash = HashPassword(password, saltBytes);
+
             string connectionString = "Server=localhost\\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;";
-            string query = "INSERT INTO STUDENT(studentName, username, password)" +
-                " VALUES('" + name +"','" + username + "','" + password + "')";
+            string query = "INSERT INTO STUDENT(name, username, hash, salt, role)" +
+                " VALUES('" + name +"','" + username + "','" + hash + "','" + salt + "', 'basic')";
             string checkUsername = "SELECT COUNT(1) FROM Student where username = '" + username + "';";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -70,10 +71,12 @@ namespace student
 
         private byte[] GenerateSalt()
         {
+            int i = 1;
             using (var rng = new RNGCryptoServiceProvider())
             {
                 byte[] salt = new byte[16]; // 16 bytes = 128 bits
                 rng.GetBytes(salt);
+                i++;
                 return salt;
             }
         }
@@ -81,9 +84,11 @@ namespace student
         // Method to hash the password with the salt
         private string HashPassword(string password, byte[] salt)
         {
+            int i = 0;
             using (var rfc2898 = new Rfc2898DeriveBytes(password, salt, 10000)) // 10,000 iterations
             {
                 byte[] hash = rfc2898.GetBytes(32); // 32 bytes = 256 bits hash
+                i++;
                 return Convert.ToBase64String(hash);
             }
         }

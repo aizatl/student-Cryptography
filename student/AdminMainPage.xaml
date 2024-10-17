@@ -16,34 +16,29 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+
         <TextBlock x:Name="test" Text="Hi loginUser" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"  Height="20"/>
         <Button Content="Logout" Margin="320,0,0,0" Click="BackButton_Click" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"  Height="20" Grid.Column="1"/>
-        <!-- Box 1 -->
-        <Button Grid.Row="1" Grid.Column="0" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box1_Click">
+
+        <!-- AES Button -->
+        <Button Grid.Row="1" Grid.Column="0" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="AES_Click" Height="190" Width="350">
             <StackPanel>
-                <TextBlock Text="View All Complain" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Text="AES" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </StackPanel>
         </Button>
 
-        <!-- Box 2 -->
-        <Button Grid.Row="1" Grid.Column="1" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box2_Click">
+        <!-- DES Button -->
+        <Button Grid.Row="1" Grid.Column="1" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="DES_Click" Height="190" Width="350">
             <StackPanel>
-                <TextBlock Text="View All Student" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Text="DES" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </StackPanel>
         </Button>
 
-        <!-- Box 3 --><!--
-        <Button Grid.Row="2" Grid.Column="0" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box3_Click">
+        <!-- TDES Button -->
+        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="TDES_Click" Height="180" Width="350" Margin="50,0,50,10">
             <StackPanel>
-                <TextBlock Text="Text 3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Text="TDES" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </StackPanel>
         </Button>
-
-        --><!-- Box 4 --><!--
-        <Button Grid.Row="2" Grid.Column="1" Background="Transparent" BorderBrush="Black" BorderThickness="1" Click="Box4_Click">
-            <StackPanel>
-                <TextBlock Text="Text 4" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </StackPanel>
-        </Button>-->
     </Grid>
 </Window>

@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Security.Cryptography;
 
 namespace student
 {
@@ -29,9 +30,11 @@ namespace student
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string username = UsernameTextBox.Text;
-            string password = PasswordBox.Password;
+            string password = "aizat";// PasswordBox.Password;
             string connectionString = "Server=localhost\\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;";
-            string query = "SELECT COUNT(1) FROM Student where username = '" + username + "' and password = '" + password + "';";
+            string query = "SELECT salt, hash FROM Student WHERE username = '" + username + "'";
+
+            //string query = "SELECT COUNT(1) FROM Student where username = '" + username + "' and password = '" + password + "';";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -39,21 +42,28 @@ namespace student
                 try
                 {
                     connection.Open();
-                    int userCount = (int)command.ExecuteScalar();
-                    if (userCount > 0)
-                    {
-                        MessageBox.Show("Login successful!");
-                        AdminMainPage mainPage1 = new AdminMainPage(username);
-                        mainPage1.Show();    
-                        this.Close();
-                    }
-                    else {
-                        MessageBox.Show("Wrong login credential");
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read()) {
+                        string salt = reader["salt"].ToString();
+                        string hash = reader["hash"].ToString();
+
+                        byte[] saltBytes = Convert.FromBase64String(salt);
+                        string newHash = HashPassword(password, saltBytes);
+
+                        if (hash == newHash) {
+                            //MessageBox.Show("Login successful!");
+                            AdminMainPage mainPage1 = new AdminMainPage(username);
+                            mainPage1.Show();
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Wrong login credential");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Handle exceptions
                     MessageBox.Show("An error occurred: " + ex.Message);
                 }
 
@@ -63,6 +73,16 @@ namespace student
             CreateAcc createAcc = new CreateAcc();
             createAcc.Show();
             this.Close();
+        }
+        private string HashPassword(string password, byte[] salt)
+        {
+            int i = 0;
+            using (var rfc2898 = new Rfc2898DeriveBytes(password, salt, 10000)) 
+            {
+                byte[] hash = rfc2898.GetBytes(32);
+                i++;
+                return Convert.ToBase64String(hash);
+            }
         }
         private void LoadStudentData()
         {

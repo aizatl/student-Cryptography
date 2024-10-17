@@ -8,7 +8,7 @@
         Title="MainWindow" Height="200" Width="400">
     <Grid>
         <TextBlock Text="Username:" Margin="30,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-        <TextBox x:Name="UsernameTextBox" Width="200" Margin="100,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBox x:Name="UsernameTextBox" Width="200" Margin="100,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="aizat"/>
 
         <TextBlock Text="Password:" Margin="30,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
         <PasswordBox x:Name="PasswordBox" Width="200" Margin="100,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,24 +26,49 @@ namespace student
         {
             InitializeComponent();
             _username = username;
-            test.Text = "HI " + _username;
+            //test.Text = "HI " + _username;
+            test.Visibility = Visibility.Collapsed;
         }
-        
-        private void Box1_Click(object sender, RoutedEventArgs e)
+        private void AES_Click(object sender, RoutedEventArgs e)
         {
-            //view all complain
-            Complain complain = new Complain(_username);
-            complain.Show();
+            AES aes = new AES();
+            aes.Show();
             this.Close();
         }
 
-        private void Box2_Click(object sender, RoutedEventArgs e)
+        private void DES_Click(object sender, RoutedEventArgs e)
         {
+            DES des = new DES();
+            des.Show();
+            this.Close();
+        }
 
+        private void TDES_Click(object sender, RoutedEventArgs e)
+        {
+            TDES tdes = new TDES();
+            tdes.Show();
+            this.Close();
         }
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-
+            MainWindow MW = new MainWindow();
+            MW.Show();
+            this.Close();
         }
+        //private void Box1_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //view all complain
+        //    Complain complain = new Complain(_username);
+        //    complain.Show();
+        //    this.Close();
+        //}
+
+        //private void Box2_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //student click
+        //}
+        
+
+        
     }
 }
