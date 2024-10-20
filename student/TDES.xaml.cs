@@ -30,33 +30,31 @@ namespace student
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             if (KeyTextBox1.Text != null) {
+                string plainText = PlainTextBox.Text;
                 byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
                 byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
                 byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
-                string plainText = PlainTextBox.Text;
-                byte[] finalKeyByte1 = new byte[8];
-                byte[] finalKeyByte2 = new byte[8];
-                byte[] finalKeyByte3 = new byte[8];
-                Buffer.BlockCopy(keyBytes1, 0, finalKeyByte1, 0, Math.Min(keyBytes1.Length, finalKeyByte1.Length));
-                Buffer.BlockCopy(keyBytes2, 0, finalKeyByte2, 0, Math.Min(keyBytes2.Length, finalKeyByte2.Length));
-                Buffer.BlockCopy(keyBytes3, 0, finalKeyByte3, 0, Math.Min(keyBytes3.Length, finalKeyByte3.Length));
-                string ciphertext = EncryptTDES(plainText, finalKeyByte1, finalKeyByte2, finalKeyByte3);
+
+                byte[] combinedKey = new byte[24];
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes(KeyTextBox1.Text.PadRight(8).Substring(0, 8)), 0, combinedKey, 0, 8);
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 8, 8);
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 16, 8);
+
+                string ciphertext = EncryptTDES(plainText, combinedKey);
                 EncryptedTextBox.Text = ciphertext;
                 CiphertextBox.Text = ciphertext;
 
             }
 
         }
-        private string EncryptTDES(string plainText, byte[] Key1, byte[] Key2, byte[] Key3)
+        private string EncryptTDES(string plainText, byte[] combinedKey)
         {
             byte[] encrypted;
-            byte[] combinedKey = new byte[24];
-            Buffer.BlockCopy(Key1, 0, combinedKey, 0, 8);
-            Buffer.BlockCopy(Key2, 0, combinedKey, 8, 8);
-            Buffer.BlockCopy(Key3, 0, combinedKey, 16, 8);
             using (TripleDESCryptoServiceProvider tdesAlg = new TripleDESCryptoServiceProvider())
             {
                 tdesAlg.Key = combinedKey;
+                tdesAlg.GenerateIV(); 
+                this.iv = tdesAlg.IV;
 
                 ICryptoTransform encryptor = tdesAlg.CreateEncryptor(tdesAlg.Key, tdesAlg.IV);
 
@@ -77,8 +75,47 @@ namespace student
 
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!string.IsNullOrEmpty(CiphertextBox.Text) && !string.IsNullOrEmpty(EncryptedTextBox.Text)) {
+                string ciphertext = CiphertextBox.Text;
+                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
+                byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
+                byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
 
+                byte[] combinedKey = new byte[24];
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes(KeyTextBox1.Text.PadRight(8).Substring(0, 8)), 0, combinedKey, 0, 8);
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 8, 8);
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 16, 8);
+
+                string plaintext = DecryptTDES(ciphertext, combinedKey);
+                DecryptedTextBox.Text = plaintext;
+            }
         }
+        private string DecryptTDES(string cipherText, byte[] combinedKey)
+        {
+            byte[] decrypted;
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+
+            using (TripleDESCryptoServiceProvider tdesAlg = new TripleDESCryptoServiceProvider())
+            {
+                tdesAlg.Key = combinedKey;
+                tdesAlg.IV = iv;
+
+                ICryptoTransform decryptor = tdesAlg.CreateDecryptor(tdesAlg.Key, tdesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(cipherBytes))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            decrypted = Encoding.UTF8.GetBytes(srDecrypt.ReadToEnd());
+                        }
+                    }
+                }
+            }
+            return Encoding.UTF8.GetString(decrypted);
+        }
+
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
