@@ -22,6 +22,7 @@ namespace student
     public partial class TDES : Window
     {
         byte[] iv = new byte[8];
+        byte[] combinedKey = new byte[24];//3 keys means 3*8
         public TDES()
         {
             InitializeComponent();
@@ -35,7 +36,6 @@ namespace student
                 byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
                 byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
 
-                byte[] combinedKey = new byte[24];
                 Buffer.BlockCopy(Encoding.UTF8.GetBytes(KeyTextBox1.Text.PadRight(8).Substring(0, 8)), 0, combinedKey, 0, 8);
                 Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 8, 8);
                 Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 16, 8);
@@ -77,15 +77,6 @@ namespace student
         {
             if (!string.IsNullOrEmpty(CiphertextBox.Text) && !string.IsNullOrEmpty(EncryptedTextBox.Text)) {
                 string ciphertext = CiphertextBox.Text;
-                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
-                byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
-                byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
-
-                byte[] combinedKey = new byte[24];
-                Buffer.BlockCopy(Encoding.UTF8.GetBytes(KeyTextBox1.Text.PadRight(8).Substring(0, 8)), 0, combinedKey, 0, 8);
-                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 8, 8);
-                Buffer.BlockCopy(Encoding.UTF8.GetBytes((string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text).PadRight(8).Substring(0, 8)), 0, combinedKey, 16, 8);
-
                 string plaintext = DecryptTDES(ciphertext, combinedKey);
                 DecryptedTextBox.Text = plaintext;
             }

@@ -34,15 +34,12 @@ namespace student
             {
                 string plainText = PlainTextBox.Text.ToString();
                 string key = KeyTextBox.Text.ToString();
-                DecryptedTextBox.Text = "";
-                CiphertextBox.Text = "";
-                EncryptedTextBox.Text = "";
                 byte[] keyBytes = Encoding.UTF8.GetBytes(key);
                 if (key == null || key.Length <= 0)
                     keyBytes = desAlg.Key;
                 byte[] finalKeyBytes = new byte[8];
                 Buffer.BlockCopy(keyBytes, 0, finalKeyBytes, 0, Math.Min(keyBytes.Length, finalKeyBytes.Length));
-                this.finalKey = finalKeyBytes;
+                finalKey = finalKeyBytes;
                 desAlg.GenerateIV(); // Generate a random IV
                 iv = desAlg.IV;
                 string encrypted = EncryptDES(plainText, finalKeyBytes, iv);
