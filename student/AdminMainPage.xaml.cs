@@ -55,6 +55,13 @@ namespace student
             MW.Show();
             this.Close();
         }
+
+        private void test_Click(object sender, RoutedEventArgs e)
+        {
+            Testing t = new Testing();
+            t.Show();
+            this.Close();
+        }
         //private void Box1_Click(object sender, RoutedEventArgs e)
         //{
         //    //view all complain
@@ -67,8 +74,8 @@ namespace student
         //{
         //    //student click
         //}
-        
 
-        
+
+
     }
 }
