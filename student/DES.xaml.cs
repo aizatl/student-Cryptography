@@ -21,7 +21,7 @@ namespace student
     /// </summary>
     public partial class DES : Window
     {
-        byte[] finalKey = new byte[8];//store key because for aes, both sender and receiver use same key
+        byte[] finalKey = new byte[8];
         byte[] iv = new byte[8];
         public DES()
         {
@@ -83,6 +83,8 @@ namespace student
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
                 desAlg.Key = Key;
+                //desAlg.GenerateKey();
+                //Key = desAlg.Key;
                 desAlg.IV = IV;
 
                 ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);

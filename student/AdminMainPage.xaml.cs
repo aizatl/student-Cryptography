@@ -59,6 +59,7 @@ namespace student
         private void test_Click(object sender, RoutedEventArgs e)
         {
             Testing t = new Testing();
+            //testingFromQariLaptop t = new testingFromQariLaptop();
             t.Show();
             this.Close();
         }

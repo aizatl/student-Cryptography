@@ -1,0 +1,33 @@
+﻿<Window x:Class="student.testingFromQariLaptop"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        Title="3DES Encryption" Height="auto" Width="400">
+    <Grid>
+        <StackPanel Margin="20">
+            <TextBlock Text="Enter Plaintext:" />
+            <TextBox x:Name="PlainTextBox" Height="30" Text="hello"/>
+
+            <TextBlock Text="Enter Key 1:" Margin="0,10,0,0"/>
+            <TextBox x:Name="Key1TextBox" Height="30" Text="123"/>
+
+            <TextBlock Text="Enter Key 2:" Margin="0,10,0,0"/>
+            <TextBox x:Name="Key2TextBox" Height="30" Text="456"/>
+
+            <TextBlock Text="Enter Key 3:" Margin="0,10,0,0"/>
+            <TextBox x:Name="Key3TextBox" Height="30" Text="789"/>
+
+            <Button Content="Manual 3DES" Margin="0,20,0,0" Click="Perform3DES_Click"/>
+
+            <TextBlock Text="Encrypted Result:" Margin="0,10,0,0"/>
+            <TextBox x:Name="ResultTextBox" Height="30" IsReadOnly="True"/>
+
+            <TextBlock Text="Enter Ciphertext (Base64):" Margin="0,10,0,0"/>
+            <TextBox x:Name="CipherTextBox" Height="30" />
+
+            <Button Content="Decrypt" Margin="0,20,0,0" Click="DecryptButton_Click"/>
+
+            <TextBlock Text="Decrypted Result:" Margin="0,10,0,0"/>
+            <TextBox x:Name="DecryptedResultTextBox" Height="30" IsReadOnly="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
