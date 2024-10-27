@@ -63,20 +63,5 @@ namespace student
             t.Show();
             this.Close();
         }
-        //private void Box1_Click(object sender, RoutedEventArgs e)
-        //{
-        //    //view all complain
-        //    Complain complain = new Complain(_username);
-        //    complain.Show();
-        //    this.Close();
-        //}
-
-        //private void Box2_Click(object sender, RoutedEventArgs e)
-        //{
-        //    //student click
-        //}
-
-
-
     }
 }

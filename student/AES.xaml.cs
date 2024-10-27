@@ -30,24 +30,35 @@ namespace student
 
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
-            using (Aes aes = Aes.Create()) {
-                string plainText = PlainTextBox.Text.ToString();
-                string key = KeyTextBox.Text.ToString();
-                DecryptedTextBox.Text = "";
-                CiphertextBox.Text = "";
-                EncryptedTextBox.Text = "";
-                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-                if (key == null || key.Length <= 0)
-                    keyBytes = aes.Key;
-                byte[] finalKeyBytes = new byte[32];
-                Buffer.BlockCopy(keyBytes, 0, finalKeyBytes, 0, Math.Min(keyBytes.Length, finalKeyBytes.Length));
-                this.finalKey = finalKeyBytes;
-                aes.GenerateIV(); // Generate a random IV
-                iv = aes.IV;
-                string encrypted = EncryptAES(plainText, finalKeyBytes, iv);
-                EncryptedTextBox.Text = encrypted;
-                CiphertextBox.Text = encrypted;
+            if (KeyTextBox.Text.Length == 16 || KeyTextBox.Text.Length == 24 || KeyTextBox.Text.Length == 32) {
+                using (Aes aes = Aes.Create())
+                {
+                    string plainText = PlainTextBox.Text.ToString();
+                    string key = KeyTextBox.Text.ToString();
+                    DecryptedTextBox.Text = "";
+                    CiphertextBox.Text = "";
+                    EncryptedTextBox.Text = "";
+                    byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+                    if (key == null || key.Length <= 0)
+                        keyBytes = aes.Key;
+                    byte[] finalKeyBytes = new byte[32];
+                    Buffer.BlockCopy(keyBytes, 0, finalKeyBytes, 0, Math.Min(keyBytes.Length, finalKeyBytes.Length));
+                    this.finalKey = finalKeyBytes;
+                    aes.GenerateIV(); 
+                    // Generate a random IV
+                    //byte[] ivs = new byte[16] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+                    //aes.IV = ivs;
+                    iv = aes.IV;
+                    string encrypted = EncryptAES(plainText, finalKeyBytes, iv);
+                    EncryptedTextBox.Text = encrypted;
+                    CiphertextBox.Text = encrypted;
+                }
             }
+            else
+            {
+                MessageBox.Show("Key must be 16/24/32 bytes");
+            }
+
         }
 
         private string EncryptAES(string plainText, byte[] Key, byte[] IV)

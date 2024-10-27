@@ -22,6 +22,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections;
+using System.Net;
 
 namespace student
 {
@@ -36,56 +37,7 @@ namespace student
             InitializeComponent();
         }
 
-        private void EncryptButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (KeyTextBox1.Text != null)
-            {
-                string plainText = PlainTextBox.Text;
-                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
-                byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
-                byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
-                byte[] finalKeyBytes1 = new byte[8];
-                byte[] finalKeyBytes2 = new byte[8];
-                byte[] finalKeyBytes3 = new byte[8];
-                Buffer.BlockCopy(keyBytes1, 0, finalKeyBytes1, 0, Math.Min(keyBytes1.Length, finalKeyBytes1.Length));
-                Buffer.BlockCopy(keyBytes2, 0, finalKeyBytes2, 0, Math.Min(keyBytes2.Length, finalKeyBytes2.Length));
-                Buffer.BlockCopy(keyBytes3, 0, finalKeyBytes3, 0, Math.Min(keyBytes3.Length, finalKeyBytes3.Length));
-                try
-                {
-                    string ciphertext = DoWork(plainText, finalKeyBytes1, finalKeyBytes2, finalKeyBytes3);
-                    //string ciphertext = DoWork(plainText, keyBytes1, keyBytes2, keyBytes3);
-                    EncryptedTextBox.Text = ciphertext;
-                    CiphertextBox.Text = ciphertext;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("An error occurred: " + ex.Message);
-                }
-            }
-
-        }
-        private string DoWork(string plainText, byte[] keyBytes1, byte[] keyBytes2, byte[] keyBytes3)
-        {
-            byte[] plaintextByte = Encoding.UTF8.GetBytes(plainText);
-
-            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            {
-                desAlg.GenerateIV();
-                //byte[] predefinedIV = new byte[8] { 3, 6, 3, 1, 5, 9, 7, 8 }; 
-                //desAlg.IV = predefinedIV;
-                iv = desAlg.IV;
-                desAlg.Padding = PaddingMode.PKCS7;
-            }
-            byte[] result1 = EncryptDES(plaintextByte, keyBytes1, iv);
-            //byte[] result2 = DecryptDES(result1, keyBytes1, iv);
-            byte[] result2 = EncryptDES(result1, keyBytes2, iv);
-            byte[] result3 = EncryptDES(result2, keyBytes3, iv);
-
-            string a = Convert.ToBase64String(result3);
-            string b = Convert.ToBase64String(iv);
-            return Convert.ToBase64String(result3);
-        }
-
+        
         private byte[] EncryptDES(byte[] dataByte, byte[] key, byte[] iv)
         {
             //using (MemoryStream mStream = new MemoryStream())
@@ -130,113 +82,232 @@ namespace student
             }
         }
 
-        private byte[] DecryptDES(byte[] dataByte, byte[] key, byte[] iv)
+        private byte[] DecryptDES(byte[] buffer, byte[] key, byte[] iv)
         {
-            //byte[] decrypted = new byte[dataByte.Length];
-            //int offset = 0;
-
-            //// Create a new MemoryStream using the provided array of encrypted data.
-            //using (MemoryStream mStream = new MemoryStream(dataByte))
-            //{
-            //    // Create a new DES object.
-            //    using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            //    // Create a DES decryptor from the key and IV
-            //    using (ICryptoTransform decryptor = desAlg.CreateDecryptor(key, iv))
-            //    // Create a CryptoStream using the MemoryStream and decryptor
-            //    using (var cStream = new CryptoStream(mStream, decryptor, CryptoStreamMode.Read))
-            //    {
-            //        // Keep reading from the CryptoStream until it finishes (returns 0).
-            //        int read = 1;
-
-            //        while (read > 0)
-            //        {
-            //            read = cStream.Read(decrypted, offset, decrypted.Length - offset);
-            //            offset += read;
-            //        }
-            //    }
-            //}
-
-            //// Convert the buffer into a string and return it.
-            //return Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(decrypted, 0, offset));
-            //here aizat
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
                 desAlg.Key = key;
                 desAlg.IV = iv;
                 desAlg.Padding = PaddingMode.PKCS7;
+                //desAlg.Padding = PaddingMode.None;
+
+                // Use TransformFinalBlock to perform raw decryption on the byte array
                 ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+                byte[] decryptedBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
 
-                using (MemoryStream msDecrypt = new MemoryStream(dataByte))
-
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (MemoryStream msDecrypted = new MemoryStream())
-                        {
-                            csDecrypt.CopyTo(msDecrypted);
-                            //return msDecrypted.ToArray();
-                            byte[] encryptedData = msDecrypted.ToArray();
-                            return encryptedData;
-
-                        }
-                    }
-                }
+                return decryptedBytes;
             }
+            //using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
+            //{
+            //    desAlg.Key = key;
+            //    desAlg.IV = iv;
+            //    //desAlg.Padding = PaddingMode.PKCS7;
+            //    desAlg.Padding = PaddingMode.None;
+            //    ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+
+            //    using (MemoryStream msDecrypt = new MemoryStream(dataByte))
+
+            //    {
+            //        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+            //        {
+            //            using (MemoryStream msDecrypted = new MemoryStream())
+            //            {
+            //                csDecrypt.CopyTo(msDecrypted);
+            //                //return msDecrypted.ToArray();
+            //                byte[] encryptedData = msDecrypted.ToArray();
+            //                return encryptedData;
+
+            //            }
+            //        }
+            //    }
+            //}
 
         }
-        private void DecryptButton_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(CiphertextBox.Text) && !string.IsNullOrEmpty(EncryptedTextBox.Text))
+            AdminMainPage AMP = new AdminMainPage("");
+            AMP.Show();
+            this.Close();
+        }
+
+        private void EncryptKey1Button_Click(object sender, RoutedEventArgs e)
+        {
+            string plainText = PlainTextBox.Text;
+            byte[] plaintextByte = Encoding.UTF8.GetBytes(plainText);
+            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
-                string ciphertext = CiphertextBox.Text;
+                byte[] predefinedIV = new byte[8] { 3, 6, 3, 1, 5, 9, 7, 8 };
+                desAlg.IV = predefinedIV;
+                this.iv = desAlg.IV;
+            }
+            if (KeyTextBox1.Text.Length == 8 )
+            {
                 byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
-                byte[] keyBytes2 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text);
-                byte[] keyBytes3 = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text);
-                byte[] finalKeyBytes1 = new byte[8];
-                byte[] finalKeyBytes2 = new byte[8];
-                byte[] finalKeyBytes3 = new byte[8];
-                Buffer.BlockCopy(keyBytes1, 0, finalKeyBytes1, 0, Math.Min(keyBytes1.Length, finalKeyBytes1.Length));
-                Buffer.BlockCopy(keyBytes2, 0, finalKeyBytes2, 0, Math.Min(keyBytes2.Length, finalKeyBytes2.Length));
-                Buffer.BlockCopy(keyBytes3, 0, finalKeyBytes3, 0, Math.Min(keyBytes3.Length, finalKeyBytes3.Length));
-                
                 try
                 {
-                    string plaintext = DoWorkDec(ciphertext, finalKeyBytes1, finalKeyBytes2, finalKeyBytes3);
-                    //string ciphertext = DoWork(plainText, keyBytes1, keyBytes2, keyBytes3);
-                    
-                    DecryptedTextBox.Text = plaintext;
+                    byte[] result1 = EncryptDES(plaintextByte, keyBytes1, iv);
+                    string showResult1 = BitConverter.ToString(result1);
+                    Key1ResultTextBox.Text = showResult1;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("An error occurred: " + ex.Message);
                 }
             }
-        }
-        private string DoWorkDec(string ciphertext, byte[] keyBytes1, byte[] keyBytes2, byte[] keyBytes3)
-        {
-            byte[] ciphertextByte = Convert.FromBase64String(ciphertext);
-            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
+            else
             {
-                //desAlg.GenerateIV();
-                //iv = desAlg.IV;
-                desAlg.Padding = PaddingMode.PKCS7;
+                MessageBox.Show("Key must be 8 bytes");
             }
-            byte[] result1 = DecryptDES(ciphertextByte, keyBytes3, iv);
-            //byte[] result2 = EncryptDES(result1, keyBytes2, iv);
-            byte[] result2 = DecryptDES(result1, keyBytes2, iv);
-
-            byte[] result3 = DecryptDES(result2, keyBytes1, iv);
-
-
-            return Encoding.UTF8.GetString(result3);
         }
 
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
+        private void EncryptKey2Button_Click(object sender, RoutedEventArgs e)
         {
-            AdminMainPage AMP = new AdminMainPage("");
-            AMP.Show();
-            this.Close();
+            string result1 = Key1ResultTextBox.Text.Replace("-", "");
+
+            byte[] result1Byte = new byte[result1.Length / 2];
+            for (int i = 0; i < result1Byte.Length; i++)
+            {
+                result1Byte[i] = Convert.ToByte(result1.Substring(i * 2, 2), 16);
+            }
+            
+            if (KeyTextBox1.Text.Length == 8)
+            {
+                byte[] keyBytes2 = Encoding.UTF8.GetBytes(KeyTextBox2.Text);
+                try
+                {
+                    byte[] result2 = EncryptDES(result1Byte, keyBytes2, iv);
+                    //byte[] result2 = DecryptDES(result1Byte, keyBytes2, iv);
+                    string showResult2 = BitConverter.ToString(result2);
+                    Key2ResultTextBox.Text = showResult2;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Key must be 8 bytes");
+            }
+        }
+        private void EncryptKey3Button_Click(object sender, RoutedEventArgs e)
+        {
+            string result2 = Key2ResultTextBox.Text.Replace("-", ""); ;
+
+            byte[] result2Byte = new byte[result2.Length / 2];
+            for (int i = 0; i < result2Byte.Length; i++)
+            {
+                result2Byte[i] = Convert.ToByte(result2.Substring(i * 2, 2), 16);
+            }
+            if (KeyTextBox1.Text.Length == 8)
+            {
+                byte[] keyBytes3 = Encoding.UTF8.GetBytes(KeyTextBox3.Text);
+                try
+                {
+                    byte[] result3 = EncryptDES(result2Byte, keyBytes3, iv);
+                    string showResult2 = BitConverter.ToString(result3);
+                    Key3ResultTextBox.Text = showResult2;
+                    CiphertextBox.Text = showResult2;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Key must be 8 bytes");
+            }
+        }
+
+        private void DecryptKey3Button_Click(object sender, RoutedEventArgs e)
+        {
+            string result3 = CiphertextBox.Text.Replace("-", "");
+
+            byte[] result3Byte = new byte[result3.Length / 2];
+            for (int i = 0; i < result3Byte.Length; i++)
+            {
+                result3Byte[i] = Convert.ToByte(result3.Substring(i * 2, 2), 16);
+            }
+
+            if (KeyTextBox1.Text.Length == 8)
+            {
+                byte[] keyBytes3 = Encoding.UTF8.GetBytes(KeyTextBox3.Text);
+                try { 
+                    byte[] result4 = DecryptDES(result3Byte, keyBytes3, iv);//this decrypt
+                    string showResult4 = BitConverter.ToString(result4);
+                    DecryptKey3ResultTextBox.Text = showResult4;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Key must be 8 bytes");
+            }
+        }
+
+        private void DecryptKey2Button_Click(object sender, RoutedEventArgs e)
+        {
+            string result4 = DecryptKey3ResultTextBox.Text.Replace("-", ""); ;
+
+            byte[] result4Byte = new byte[result4.Length / 2];
+            for (int i = 0; i < result4Byte.Length; i++)
+            {
+                result4Byte[i] = Convert.ToByte(result4.Substring(i * 2, 2), 16);
+            }
+            if (KeyTextBox1.Text.Length == 8)
+            {
+                byte[] keyBytes2 = Encoding.UTF8.GetBytes(KeyTextBox2.Text);
+                try
+                {
+                    byte[] result5 = DecryptDES(result4Byte, keyBytes2, iv);
+                    //byte[] result5 = EncryptDES(result4Byte, keyBytes2, iv);
+                    string showResult5 = BitConverter.ToString(result5);
+                    DecryptKey2ResultTextBox.Text = showResult5;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Key must be 8 bytes");
+            }
+        }
+
+        private void DecryptKey1Button_Click(object sender, RoutedEventArgs e)
+        {
+            string result5 = DecryptKey2ResultTextBox.Text.Replace("-", "");
+
+            byte[] result5Byte = new byte[result5.Length / 2];
+            for (int i = 0; i < result5Byte.Length; i++)
+            {
+                result5Byte[i] = Convert.ToByte(result5.Substring(i * 2, 2), 16);
+            }
+
+            if (KeyTextBox1.Text.Length == 8)
+            {
+                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
+                try
+                {
+                    byte[] result6 = DecryptDES(result5Byte, keyBytes1, iv);
+                    //string showResult6 = BitConverter.ToString(result6);
+                    string decryptedText = Encoding.UTF8.GetString(result6);
+                    DecryptKey1ResultTextBox.Text = decryptedText;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Key must be 8 bytes");
+            }
         }
     }
 }

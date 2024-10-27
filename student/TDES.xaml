@@ -16,16 +16,16 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Margin="10" Text="Enter Plain Text:" />
-        <TextBox x:Name="PlainTextBox" Grid.Row="0" Margin="150,10,10,10" Width="400" Text="hello" />
+        <TextBox x:Name="PlainTextBox" Grid.Row="0" Margin="150,10,10,10" Width="400" Text="hello123" />
 
         <TextBlock Grid.Row="1" Margin="10" Text="Enter Key 1:" />
-        <TextBox x:Name="KeyTextBox1" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="123" />
+        <TextBox x:Name="KeyTextBox1" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="123kop09" />
 
-        <TextBlock Grid.Row="2" Margin="10" Text="Enter Key 2(optional):" />
-        <TextBox x:Name="KeyTextBox2" Grid.Row="2" Margin="150,10,10,10" Width="400" Text="456" />
+        <TextBlock Grid.Row="2" Margin="10" Text="Enter Key 2:" />
+        <TextBox x:Name="KeyTextBox2" Grid.Row="2" Margin="150,10,10,10" Width="400" Text="4561254y" />
 
-        <TextBlock Grid.Row="3" Margin="10" Text="Enter Key 3(optional):" />
-        <TextBox x:Name="KeyTextBox3" Grid.Row="3" Margin="150,10,10,10" Width="400" Text="789" />
+        <TextBlock Grid.Row="3" Margin="10" Text="Enter Key 3:" />
+        <TextBox x:Name="KeyTextBox3" Grid.Row="3" Margin="150,10,10,10" Width="400" Text="78998u5r" />
 
         <Button x:Name="EncryptButton" Grid.Row="4" Content="Encrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,10,0,10" Click="EncryptButton_Click" />
 

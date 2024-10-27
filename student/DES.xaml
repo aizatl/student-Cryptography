@@ -15,10 +15,10 @@
 
        
         <TextBlock Grid.Row="0" Margin="10" Text="Enter Plain Text:" />
-        <TextBox x:Name="PlainTextBox" Grid.Row="0" Margin="150,10,10,10" Width="400" Text="hello" />
+        <TextBox x:Name="PlainTextBox" Grid.Row="0" Margin="150,10,10,10" Width="400" Text="hello123" />
 
         <TextBlock Grid.Row="1" Margin="10" Text="Enter Encryption Key:" />
-        <TextBox x:Name="KeyTextBox" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="123" />
+        <TextBox x:Name="KeyTextBox" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="123kop09" />
 
         <Button x:Name="EncryptButton" Grid.Row="2" Content="Encrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,10,0,10" Click="EncryptButton_Click" />
 
