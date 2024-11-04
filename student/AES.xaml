@@ -1,7 +1,7 @@
 ﻿<Window x:Class="student.AES"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AES" Height="430" Width="615">
+        Title="AES" Height="490" Width="615">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -11,26 +11,41 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Margin="10" Text="Enter Plain Text:" />
-        <TextBox x:Name="PlainTextBox" Grid.Row="0" Margin="150,10,10,10" Width="400" Text="hello" />
+        <!-- ComboBox for Mode Selection -->
+        <TextBlock Grid.Row="0" Margin="420,12,90,8" Text="Select Mode:" HorizontalAlignment="Right" />
+        <ComboBox x:Name="ModeComboBox" Grid.Row="0" Margin="0,10,10,10" Width="70" SelectedIndex="0" HorizontalAlignment="Right" SelectionChanged="modeChange">
+            <ComboBoxItem Content="CBC" />
+            <ComboBoxItem Content="ECB" />
+        </ComboBox>
 
-        <TextBlock Grid.Row="1" Margin="10" Text="Enter Encryption Key:" />
-        <TextBox x:Name="KeyTextBox" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="123" />
+        <TextBlock Grid.Row="1" Margin="10" Text="Enter Plain Text:" />
+        <TextBox x:Name="PlainTextBox" Grid.Row="1" Margin="150,10,10,10" Width="400" Text="hello" />
 
-        <Button x:Name="EncryptButton" Grid.Row="2" Content="Encrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,10,0,10" Click="EncryptButton_Click" />
+        <TextBlock Grid.Row="2" Margin="10" Text="Enter Encryption Key:" />
+        <TextBox x:Name="KeyTextBox" Grid.Row="2" Margin="150,10,10,10" Width="400" Text="qawsdnki09185123" />
 
-        <TextBlock Grid.Row="3" Margin="10" Text="Encrypted Output:" />
-        <TextBox x:Name="EncryptedTextBox" Grid.Row="3" Margin="150,10,10,10" Width="400" IsReadOnly="True" />
+        <!-- IV input below Key input -->
+        <TextBlock Grid.Row="3" Name="textIV" Margin="10" Text="Enter IV (Initialization Vector):" Visibility="Visible"/>
+        <TextBox x:Name="IVTextBox" Grid.Row="3" Margin="150,10,10,10" Width="400" Text="1234567890123456" Visibility="Visible" MaxLength="16" />
 
-        <TextBlock Grid.Row="4" Margin="10" Text="Enter Ciphertext:" />
-        <TextBox x:Name="CiphertextBox" Grid.Row="4" Margin="150,10,10,10" Width="400" />
+        <Button x:Name="EncryptButton" Grid.Row="4" Content="Encrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,10,0,10" Click="EncryptButton_Click" />
 
-        <Button x:Name="DecryptButton" Grid.Row="5" Content="Decrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,3,0,11" Click="DecryptButton_Click" />
+        <TextBlock Grid.Row="5" Margin="10" Text="Encrypted Output:" />
+        <TextBox x:Name="EncryptedTextBox" Grid.Row="5" Margin="150,10,10,10" Width="400" IsReadOnly="True" />
 
-        <TextBlock Grid.Row="6" Margin="10,39,0,-27" Text="Decrypted Output:" />
-        <TextBox x:Name="DecryptedTextBox" Grid.Row="6" Margin="160,40,40,-20" Width="400" IsReadOnly="True" />
-        <Button x:Name="backBtn" Grid.Row="6" Content="Back" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,86,0,-72" Click="BackButton_Click" />
+        <TextBlock Grid.Row="6" Margin="10" Text="Enter Ciphertext:" />
+        <TextBox x:Name="CiphertextBox" Grid.Row="6" Margin="150,10,10,10" Width="400" />
+
+        <Button x:Name="DecryptButton" Grid.Row="7" Content="Decrypt" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,3,0,11" Click="DecryptButton_Click" />
+
+        <TextBlock Grid.Row="8" Margin="10,39,0,-27" Text="Decrypted Output:" />
+        <TextBox x:Name="DecryptedTextBox" Grid.Row="8" Margin="160,40,40,-20" Width="400" IsReadOnly="True" />
+
+        <Button x:Name="backBtn" Grid.Row="8" Content="Back" Width="100" Height="30" HorizontalAlignment="Left" Margin="470,86,0,-72" Click="BackButton_Click" />
     </Grid>
 </Window>

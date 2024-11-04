@@ -31,44 +31,32 @@ namespace student
     /// </summary>
     public partial class Testing : Window
     {
-        byte[] iv = new byte[8];
+        //byte[] iv = new byte[8] { 3, 6, 3, 1, 5, 9, 7, 8 };
         public Testing()
         {
             InitializeComponent();
         }
 
         
-        private byte[] EncryptDES(byte[] dataByte, byte[] key, byte[] iv)
+        private byte[] EncryptDESPAD(byte[] dataByte, byte[] key, string mode, byte[] iv)
         {
-            //using (MemoryStream mStream = new MemoryStream())
-            //{
-            //    // Create a new DES object.
-            //    using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            //    // Create a DES encryptor from the key and IV
-            //    using (ICryptoTransform encryptor = desAlg.CreateEncryptor(key, iv))
-            //    // Create a CryptoStream using the MemoryStream and encryptor
-            //    using (var cStream = new CryptoStream(mStream, encryptor, CryptoStreamMode.Write))
-            //    {
-
-
-            //        // Write the byte array to the crypto stream and flush it.
-            //        cStream.Write(dataByte, 0, dataByte.Length);
-
-            //        // Ending the using statement for the CryptoStream completes the encryption.
-            //    }
-
-            //    // Get an array of bytes from the MemoryStream that holds the encrypted data.
-            //    byte[] ret = mStream.ToArray();
-
-            //    // Return the encrypted buffer.
-            //    return ret;
-            //}
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
                 desAlg.Key = key;
-                desAlg.IV = iv;
                 desAlg.Padding = PaddingMode.PKCS7;
-                ICryptoTransform encryptor = desAlg.CreateEncryptor(desAlg.Key, desAlg.IV);
+                
+                ICryptoTransform encryptor = desAlg.CreateEncryptor();
+                if (mode == "CBC")
+                {
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, desAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, null);
+                }
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
@@ -77,51 +65,89 @@ namespace student
                         csEncrypt.FlushFinalBlock();
                     }
                     byte[] encryptedData = msEncrypt.ToArray();
-                    return encryptedData;
+                    return encryptedData;//this should 8
                 }
             }
         }
-
-        private byte[] DecryptDES(byte[] buffer, byte[] key, byte[] iv)
+        private byte[] EncryptDESNoPad(byte[] dataByte, byte[] key, string mode, byte[] iv)
         {
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
                 desAlg.Key = key;
-                desAlg.IV = iv;
-                desAlg.Padding = PaddingMode.PKCS7;
-                //desAlg.Padding = PaddingMode.None;
+                desAlg.Padding = PaddingMode.None;
+                
+                ICryptoTransform encryptor = desAlg.CreateEncryptor();
+                if (mode == "CBC")
+                {
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, desAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, null);
+                }
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        csEncrypt.Write(dataByte, 0, dataByte.Length);
+                        csEncrypt.FlushFinalBlock();
+                    }
+                    byte[] encryptedData = msEncrypt.ToArray();
+                    return encryptedData;//this should 8
+                }
+            }
+        }
 
-                // Use TransformFinalBlock to perform raw decryption on the byte array
-                ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+        private byte[] DecryptDESPAD(byte[] buffer, byte[] key, string mode, byte[] iv)
+        {
+            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
+            {
+                desAlg.Key = key;
+                desAlg.Padding = PaddingMode.PKCS7;
+
+                ICryptoTransform decryptor = desAlg.CreateDecryptor();
+                if (mode == "CBC")
+                {
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, null);
+                }
+
                 byte[] decryptedBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
 
-                return decryptedBytes;
+                return decryptedBytes;//this should 8
             }
-            //using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            //{
-            //    desAlg.Key = key;
-            //    desAlg.IV = iv;
-            //    //desAlg.Padding = PaddingMode.PKCS7;
-            //    desAlg.Padding = PaddingMode.None;
-            //    ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+        }
+        private byte[] DecryptDESNoPAD(byte[] buffer, byte[] key, string mode, byte[] iv)
+        {
+            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
+            {
+                desAlg.Key = key;
+                desAlg.Padding = PaddingMode.None;
+                ICryptoTransform decryptor = desAlg.CreateDecryptor();
+                if (mode == "CBC")
+                {
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, null);
+                }
+                byte[] decryptedBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
 
-            //    using (MemoryStream msDecrypt = new MemoryStream(dataByte))
-
-            //    {
-            //        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-            //        {
-            //            using (MemoryStream msDecrypted = new MemoryStream())
-            //            {
-            //                csDecrypt.CopyTo(msDecrypted);
-            //                //return msDecrypted.ToArray();
-            //                byte[] encryptedData = msDecrypted.ToArray();
-            //                return encryptedData;
-
-            //            }
-            //        }
-            //    }
-            //}
-
+                return decryptedBytes;//this should 8
+            }
         }
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
@@ -134,18 +160,14 @@ namespace student
         {
             string plainText = PlainTextBox.Text;
             byte[] plaintextByte = Encoding.UTF8.GetBytes(plainText);
-            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            {
-                byte[] predefinedIV = new byte[8] { 3, 6, 3, 1, 5, 9, 7, 8 };
-                desAlg.IV = predefinedIV;
-                this.iv = desAlg.IV;
-            }
             if (KeyTextBox1.Text.Length == 8 )
             {
                 byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
                 try
                 {
-                    byte[] result1 = EncryptDES(plaintextByte, keyBytes1, iv);
+                    string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    byte[] result1 = EncryptDESPAD(plaintextByte, keyBytes1, mode, iv);
                     string showResult1 = BitConverter.ToString(result1);
                     Key1ResultTextBox.Text = showResult1;
                 }
@@ -163,7 +185,7 @@ namespace student
         private void EncryptKey2Button_Click(object sender, RoutedEventArgs e)
         {
             string result1 = Key1ResultTextBox.Text.Replace("-", "");
-
+            
             byte[] result1Byte = new byte[result1.Length / 2];
             for (int i = 0; i < result1Byte.Length; i++)
             {
@@ -175,8 +197,9 @@ namespace student
                 byte[] keyBytes2 = Encoding.UTF8.GetBytes(KeyTextBox2.Text);
                 try
                 {
-                    byte[] result2 = EncryptDES(result1Byte, keyBytes2, iv);
-                    //byte[] result2 = DecryptDES(result1Byte, keyBytes2, iv);
+                    string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    byte[] result2 = DecryptDESNoPAD(result1Byte, keyBytes2, mode, iv);
                     string showResult2 = BitConverter.ToString(result2);
                     Key2ResultTextBox.Text = showResult2;
                 }
@@ -204,7 +227,10 @@ namespace student
                 byte[] keyBytes3 = Encoding.UTF8.GetBytes(KeyTextBox3.Text);
                 try
                 {
-                    byte[] result3 = EncryptDES(result2Byte, keyBytes3, iv);
+                    byte[] result3 = new byte[8];
+                    string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    result3 = EncryptDESNoPad(result2Byte, keyBytes3, mode, iv);
                     string showResult2 = BitConverter.ToString(result3);
                     Key3ResultTextBox.Text = showResult2;
                     CiphertextBox.Text = showResult2;
@@ -232,9 +258,11 @@ namespace student
 
             if (KeyTextBox1.Text.Length == 8)
             {
-                byte[] keyBytes3 = Encoding.UTF8.GetBytes(KeyTextBox3.Text);
-                try { 
-                    byte[] result4 = DecryptDES(result3Byte, keyBytes3, iv);//this decrypt
+                byte[] keyBytes3 = Encoding.UTF8.GetBytes(KeyTextBox3Dec.Text);
+                try {
+                    string mode = ((ComboBoxItem)ModeComboBoxDec.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBoxDec.Text);
+                    byte[] result4 = DecryptDESNoPAD(result3Byte, keyBytes3, mode, iv);//this decrypt
                     string showResult4 = BitConverter.ToString(result4);
                     DecryptKey3ResultTextBox.Text = showResult4;
                 }
@@ -260,11 +288,12 @@ namespace student
             }
             if (KeyTextBox1.Text.Length == 8)
             {
-                byte[] keyBytes2 = Encoding.UTF8.GetBytes(KeyTextBox2.Text);
+                byte[] keyBytes2 = Encoding.UTF8.GetBytes(KeyTextBox2Dec.Text);
                 try
                 {
-                    byte[] result5 = DecryptDES(result4Byte, keyBytes2, iv);
-                    //byte[] result5 = EncryptDES(result4Byte, keyBytes2, iv);
+                    string mode = ((ComboBoxItem)ModeComboBoxDec.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBoxDec.Text);
+                    byte[] result5 = EncryptDESNoPad(result4Byte, keyBytes2, mode, iv);
                     string showResult5 = BitConverter.ToString(result5);
                     DecryptKey2ResultTextBox.Text = showResult5;
                 }
@@ -291,10 +320,12 @@ namespace student
 
             if (KeyTextBox1.Text.Length == 8)
             {
-                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1.Text);
+                byte[] keyBytes1 = Encoding.UTF8.GetBytes(KeyTextBox1Dec.Text);
                 try
                 {
-                    byte[] result6 = DecryptDES(result5Byte, keyBytes1, iv);
+                    string mode = ((ComboBoxItem)ModeComboBoxDec.SelectedItem).Content.ToString();
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBoxDec.Text);
+                    byte[] result6 = DecryptDESPAD(result5Byte, keyBytes1, mode, iv);
                     //string showResult6 = BitConverter.ToString(result6);
                     string decryptedText = Encoding.UTF8.GetString(result6);
                     DecryptKey1ResultTextBox.Text = decryptedText;
@@ -307,6 +338,40 @@ namespace student
             else
             {
                 MessageBox.Show("Key must be 8 bytes");
+            }
+        }
+
+        private void modeChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (IVTextBox == null) return;
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+
+            if (mode == "ECB")
+            {
+                IVTextBox.Visibility = Visibility.Collapsed;
+                textIV.Visibility = Visibility.Collapsed;
+            }
+            else if (mode == "CBC")
+            {
+                IVTextBox.Visibility = Visibility.Visible;
+                textIV.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void modeChangeDec(object sender, SelectionChangedEventArgs e)
+        {
+            if (IVTextBoxDec == null) return;
+            string mode = ((ComboBoxItem)ModeComboBoxDec.SelectedItem).Content.ToString();
+
+            if (mode == "ECB")
+            {
+                IVTextBoxDec.Visibility = Visibility.Collapsed;
+                textIVDec.Visibility = Visibility.Collapsed;
+            }
+            else if (mode == "CBC")
+            {
+                IVTextBoxDec.Visibility = Visibility.Visible;
+                textIVDec.Visibility = Visibility.Visible;
             }
         }
     }

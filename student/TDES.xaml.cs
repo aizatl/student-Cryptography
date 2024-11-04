@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace student
 {
@@ -21,8 +22,6 @@ namespace student
     /// </summary>
     public partial class TDES : Window
     {
-        byte[] iv = new byte[8];
-        byte[] combinedKey = new byte[24];//3 keys means 3*8
         public TDES()
         {
             InitializeComponent();
@@ -39,7 +38,7 @@ namespace student
                     string key2 = string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text;
                     string key3 = string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text;
                     string combined = key1 + key2 + key3;
-                    combinedKey = Encoding.UTF8.GetBytes(combined);
+                    byte[] combinedKey = Encoding.UTF8.GetBytes(combined);
                     string ciphertext = EncryptTDES(plainText, combinedKey);
                     EncryptedTextBox.Text = ciphertext;
                     CiphertextBox.Text = ciphertext;
@@ -51,13 +50,27 @@ namespace student
         }
         private string EncryptTDES(string plainText, byte[] combinedKey)
         {
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
             byte[] dataByte = Encoding.UTF8.GetBytes(plainText);
             using (TripleDESCryptoServiceProvider tdesAlg = new TripleDESCryptoServiceProvider())
             {
+                ICryptoTransform encryptor = tdesAlg.CreateEncryptor();
                 tdesAlg.Key = combinedKey;
-                tdesAlg.IV = iv;
-                //tdesAlg.Padding = PaddingMode.None;
-                ICryptoTransform encryptor = tdesAlg.CreateEncryptor(tdesAlg.Key, tdesAlg.IV);
+                tdesAlg.Padding = PaddingMode.PKCS7;
+                if (mode == "CBC")
+                {
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    tdesAlg.IV = iv;
+                    tdesAlg.Mode = CipherMode.CBC;
+                    encryptor = tdesAlg.CreateEncryptor(tdesAlg.Key, tdesAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    tdesAlg.Mode = CipherMode.ECB;
+                    encryptor = tdesAlg.CreateEncryptor(tdesAlg.Key, null);
+                }
+                
+                
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
@@ -77,6 +90,11 @@ namespace student
             if (!string.IsNullOrEmpty(CiphertextBox.Text) && !string.IsNullOrEmpty(EncryptedTextBox.Text)) {
                 string ciphertext = CiphertextBox.Text;
                 string result = ciphertext.Replace("-", "");
+                string key1 = KeyTextBox1.Text;
+                string key2 = string.IsNullOrEmpty(KeyTextBox2.Text) ? KeyTextBox1.Text : KeyTextBox2.Text;
+                string key3 = string.IsNullOrEmpty(KeyTextBox3.Text) ? KeyTextBox1.Text : KeyTextBox3.Text;
+                string combined = key1 + key2 + key3;
+                byte[] combinedKey = Encoding.UTF8.GetBytes(combined);
                 string plaintext = DecryptTDES(result, combinedKey);
                 DecryptedTextBox.Text = plaintext;
             }
@@ -84,7 +102,7 @@ namespace student
         private string DecryptTDES(string cipherText, byte[] combinedKey)
         {
             byte[] decrypted;
-
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
             byte[] cipherBytes = new byte[cipherText.Length / 2];
             for (int i = 0; i < cipherBytes.Length; i++)
             {
@@ -93,10 +111,21 @@ namespace student
 
             using (TripleDESCryptoServiceProvider tdesAlg = new TripleDESCryptoServiceProvider())
             {
+                ICryptoTransform decryptor = tdesAlg.CreateDecryptor();
                 tdesAlg.Key = combinedKey;
-                tdesAlg.IV = iv;
-                //tdesAlg.Padding = PaddingMode.None;
-                ICryptoTransform decryptor = tdesAlg.CreateDecryptor(tdesAlg.Key, tdesAlg.IV);
+                tdesAlg.Padding = PaddingMode.PKCS7;
+                if (mode == "CBC")
+                {
+                    byte[] iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    tdesAlg.IV = iv;
+                    tdesAlg.Mode = CipherMode.CBC;
+                    decryptor = tdesAlg.CreateDecryptor(tdesAlg.Key, tdesAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    tdesAlg.Mode = CipherMode.ECB;
+                    decryptor = tdesAlg.CreateDecryptor(tdesAlg.Key, null);
+                }
 
                 using (MemoryStream msDecrypt = new MemoryStream(cipherBytes))
                 {
@@ -118,6 +147,24 @@ namespace student
             AdminMainPage AMP = new AdminMainPage("");
             AMP.Show();
             this.Close();
+        }
+
+        private void modeChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (IVTextBox == null) return;
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+
+            if (mode == "ECB")
+            {
+                IVTextBox.Visibility = Visibility.Collapsed;
+                textIV.Visibility = Visibility.Collapsed;
+                IVTextBox.Text = "";
+            }
+            else if (mode == "CBC")
+            {
+                IVTextBox.Visibility = Visibility.Visible;
+                textIV.Visibility = Visibility.Visible;
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace student
 {
@@ -29,7 +30,8 @@ namespace student
 
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
-            if (KeyTextBox.Text.Length == 8) {
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+            if (KeyTextBox.Text.Length == 8 || (IVTextBox.Text.Length == 8 && mode == "CBC")) {
                 using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
                 {
                     string plainText = PlainTextBox.Text.ToString();
@@ -37,29 +39,38 @@ namespace student
                     byte[] keyBytes = Encoding.UTF8.GetBytes(key);
                     if (key == null || key.Length <= 0)
                         keyBytes = desAlg.Key;
-                    
-                    //finalKey = keyBytes;
-                    //desAlg.GenerateIV(); // Generate a random IV
-                    byte[] predefinedIV = new byte[8] { 3, 6, 3, 1, 5, 9, 7, 8 };
-                    desAlg.IV = predefinedIV;
-                    iv = desAlg.IV;
-                    string encrypted = EncryptDES(plainText, keyBytes, iv);
+                    string encrypted = EncryptDES(plainText, keyBytes);
                     EncryptedTextBox.Text = encrypted;
                     CiphertextBox.Text = encrypted;
                 }
             }
             else
             {
-                MessageBox.Show("Key must be 8 bytes");
+                MessageBox.Show("Key and IV must be 8 bytes");
             }
 
         }
-        private string EncryptDES(string plainText, byte[] Key, byte[] IV) {
+        private string EncryptDES(string plainText, byte[] Key) {
             byte[] encrypted;
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider()) {
+                ICryptoTransform encryptor = desAlg.CreateEncryptor();
                 desAlg.Key = Key;
-                desAlg.IV = IV;
-                ICryptoTransform encryptor = desAlg.CreateEncryptor(desAlg.Key, desAlg.IV);
+                desAlg.Padding = PaddingMode.Zeros;
+                if (mode == "CBC")
+                {
+                    iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, desAlg.IV);
+                }
+                else if(mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    encryptor = desAlg.CreateEncryptor(desAlg.Key, null);
+                }
+                
+                
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
@@ -79,15 +90,15 @@ namespace student
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string ciphertext = CiphertextBox.Text.ToString();
-            string key = KeyTextBox.Text.ToString();//.Replace("1","9");
+            string key = KeyTextBox.Text.ToString();
             byte[] keybyte = Encoding.UTF8.GetBytes(key);
             string plainText = DecryptDES(ciphertext, keybyte, iv);
             DecryptedTextBox.Text = plainText;
         }
-        private string DecryptDES1(string ciphertext, byte[] Key, byte[] IV)
+        private string DecryptDES(string ciphertext, byte[] Key, byte[] IV)
         {
             string result = ciphertext.Replace("-", "");
-
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
             byte[] buffer = new byte[result.Length / 2];
             for (int i = 0; i < buffer.Length; i++)
             {
@@ -96,13 +107,23 @@ namespace student
 
             using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
             {
+                ICryptoTransform decryptor = desAlg.CreateDecryptor();
                 desAlg.Key = Key;
-                //desAlg.GenerateKey();
-                //Key = desAlg.Key;
-                desAlg.IV = IV;
-
-                ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
-
+                desAlg.Padding = PaddingMode.Zeros;
+                if (mode == "CBC")
+                {
+                    iv = Encoding.UTF8.GetBytes(IVTextBox.Text);
+                    desAlg.IV = iv;
+                    desAlg.Mode = CipherMode.CBC;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
+                }
+                else if (mode == "ECB")
+                {
+                    desAlg.Mode = CipherMode.ECB;
+                    decryptor = desAlg.CreateDecryptor(desAlg.Key, null);
+                }
+                
+                //byte[] decryptedBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
                 using (MemoryStream msDecrypt = new MemoryStream(buffer))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
@@ -115,34 +136,6 @@ namespace student
                 }
             }
         }
-        private string DecryptDES(string ciphertext, byte[] Key, byte[] IV)
-        {
-            // Remove hyphens from the ciphertext
-            string result = ciphertext.Replace("-", "");
-
-            // Convert hex string to byte array
-            byte[] buffer = new byte[result.Length / 2];
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = Convert.ToByte(result.Substring(i * 2, 2), 16);
-            }
-
-            using (DESCryptoServiceProvider desAlg = new DESCryptoServiceProvider())
-            {
-                desAlg.Key = Key;
-                desAlg.IV = IV;
-                //desAlg.Padding = PaddingMode.None;
-
-                // Use TransformFinalBlock to perform raw decryption on the byte array
-                ICryptoTransform decryptor = desAlg.CreateDecryptor(desAlg.Key, desAlg.IV);
-                byte[] decryptedBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
-
-                // Convert decrypted bytes directly to string, ignoring any potential errors
-                string aizat = Encoding.UTF8.GetString(decryptedBytes);
-                string aiman =  BitConverter.ToString(decryptedBytes);
-                return Encoding.UTF8.GetString(decryptedBytes);
-            }
-        }
 
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -150,6 +143,23 @@ namespace student
             AdminMainPage AMP = new AdminMainPage("");
             AMP.Show();
             this.Close();
+        }
+
+        private void modeChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (IVTextBox == null) return;
+            string mode = ((ComboBoxItem)ModeComboBox.SelectedItem).Content.ToString();
+
+            if (mode == "ECB")
+            {
+                IVTextBox.Visibility = Visibility.Collapsed;
+                textIV.Visibility = Visibility.Collapsed;
+            }
+            else if (mode == "CBC")
+            {
+                IVTextBox.Visibility = Visibility.Visible;
+                textIV.Visibility = Visibility.Visible;
+            }
         }
     }
 }
